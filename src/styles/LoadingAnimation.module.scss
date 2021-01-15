@@ -1,0 +1,25 @@
+.container {
+    display: flex;
+    gap: 1rem;
+}
+
+.dot {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    transform: scale(0.01);
+    animation: pulsate ease-in-out infinite 1.2s;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(0.01);
+    }
+    50% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0.01);
+    }
+}

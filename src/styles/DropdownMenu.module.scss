@@ -1,0 +1,54 @@
+.container {
+    width: 15rem;
+    position: relative;
+}
+
+.selected {
+    width: 100%;
+    background-color: var(--color-white);
+    border: 0.1rem solid var(--color-primary);
+    border-radius: 0.5rem;
+    color: var(--color-primary);
+    user-select: none;
+    cursor: pointer;
+    padding: 0.5rem 1.2rem 0.5rem 2rem;
+
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    font-size: 1.8rem;
+    column-gap: 2rem;
+    align-items: center;
+}
+
+.icon {
+    display: grid;
+    align-items: center;
+    font-size: 1.6rem;
+}
+
+.options__hidden {
+    display: none;
+}
+
+.options {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: var(--color-white);
+    top: 4rem;
+    box-shadow: var(--shadow);
+    border-radius: 0.5rem;
+    padding: 1.5rem 2rem;
+    row-gap: 1rem;
+}
+
+.option {
+    font-size: 1.8rem;
+    user-select: none;
+    cursor: pointer;
+
+    &:hover {
+        font-weight: 700;
+    }
+}

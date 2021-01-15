@@ -1,0 +1,22 @@
+.header {
+    width: 100%;
+    height: 6rem;
+    background-color: var(--color-white);
+    box-shadow: var(--shadow);
+    padding: 0 3rem;
+    display: grid;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+}
+
+.logo {
+    display: grid;
+    width: 17rem;
+    height: 50%;
+
+    img {
+        height: 100%;
+    }
+}

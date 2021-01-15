@@ -1,0 +1,10 @@
+.container {
+    width: 100%;
+    position: relative;
+    padding: 3rem;
+    background-color: var(--color-white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+}

@@ -1,0 +1,140 @@
+@import 'index';
+
+.content {
+    @extend .content;
+
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content 1fr;
+    grid-template-areas: 'headline' 'left';
+}
+
+.content__selected {
+    @extend .content;
+
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: max-content 1fr;
+    grid-template-areas: 'headline headline' 'left selectedFiles';
+}
+
+.dropIndicator {
+    top: 6rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    border: 0.8rem dashed var(--color-accent);
+    z-index: 1;
+    pointer-events: none;
+    margin: 2.5rem 3rem;
+}
+
+.fileUpload {
+    display: grid;
+    justify-items: center;
+    row-gap: 1rem;
+    padding: 3rem 0;
+}
+
+.icon {
+    font-size: 5rem;
+    color: var(--color-accent);
+}
+
+.textBig {
+    font-size: 2.2rem;
+    color: var(--color-primary);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.textSmall {
+    font-size: 1.9rem;
+    color: var(--color-primary);
+    line-height: 1;
+}
+
+.input {
+    display: none;
+}
+
+.files {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    padding: 0 2rem;
+}
+
+.file {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 4rem 1fr 2rem;
+    column-gap: 1.5rem;
+    align-items: center;
+    align-self: center;
+}
+
+.fileLeft {
+    display: grid;
+    place-items: center;
+}
+
+.fileCircle {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    border: 0.2rem solid var(--color-accent);
+    position: relative;
+    clip-path: circle();
+    display: grid;
+    place-items: center;
+    color: var(--color-accent);
+    font-size: 1.1rem;
+    font-weight: 800;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--color-accent);
+        opacity: 0.25;
+    }
+}
+
+.fileName {
+    font-size: 1.6rem;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.fileSize {
+    margin-top: 0.2rem;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--color-secondary);
+}
+
+.fileDelete {
+    font-size: 1.4rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.left {
+    grid-area: left;
+    display: grid;
+    row-gap: 3rem;
+}
+
+.inline {
+    display: flex;
+    align-items: center;
+    column-gap: 1.5rem;
+    font-size: 1.8rem;
+    margin-bottom: 3rem;
+}
