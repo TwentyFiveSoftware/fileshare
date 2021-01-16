@@ -1,4 +1,5 @@
 import firebase from 'firebase/app';
+import 'firebase/firestore';
 import 'firebase/storage';
 
 firebase.initializeApp({
@@ -10,5 +11,6 @@ firebase.initializeApp({
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
 });
 
-export const storageRef = firebase.storage().ref();
+export const storage = firebase.storage();
+export const firestore = firebase.firestore();
 export default firebase;

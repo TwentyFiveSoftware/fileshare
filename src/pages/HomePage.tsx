@@ -3,7 +3,7 @@ import {FileRejection, useDropzone} from 'react-dropzone';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons';
 import {nanoid} from 'nanoid';
-import firebase, {storageRef} from '../firebase';
+import firebase, {storage, firestore} from '../firebase';
 import styles from '../styles/HomePage.module.scss';
 import Container from '../components/Container';
 import Button from '../components/Button';
@@ -28,10 +28,16 @@ type UploadInfo = {
     id: string
 }
 
+enum State {
+    SELECTING,
+    UPLOADING,
+    FINISHED
+}
+
 const HomePage: FunctionComponent = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [uploading, setUploading] = useState<boolean>(false);
     const [uploadInfo, setUploadInfo] = useState<UploadInfo>({filesUploaded: 0, filesTotal: 1, bytesUploaded: 0, bytesTotal: 1, id: ''});
+    const [state, setState] = useState<State>(State.SELECTING);
 
     const onDrop = useCallback(
         (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -68,16 +74,11 @@ const HomePage: FunctionComponent = () => {
     }, []);
 
     const generateLink = useCallback(() => {
-        setUploading(true);
+        setState(State.UPLOADING);
 
         const id = nanoid();
-        const uploadingTasks: firebase.storage.UploadTask[] = [];
         const progress: Map<string, { bytesTransferred: number, running: boolean }> = new Map();
-
-        for (const file of selectedFiles)
-            uploadingTasks.push(storageRef.child(`${id}/${file.name}`).put(file));
-
-        const bytesTotal = uploadingTasks.reduce((sum, task) => sum + task.snapshot.totalBytes, 0);
+        let bytesTotal = 0;
 
         const updateUploadingInfo = () => {
             const arr = Array.from(progress.values());
@@ -86,82 +87,100 @@ const HomePage: FunctionComponent = () => {
             setUploadInfo({bytesTotal, bytesUploaded, filesUploaded, filesTotal: selectedFiles.length, id});
         }
 
-        for (const task of uploadingTasks)
+        const databaseInfo: { name: string, url: string, size: number, path: string }[] = [];
+
+        for (const file of selectedFiles) {
+            const task = storage.ref(`${id}/${file.name}`).put(file);
+            bytesTotal += task.snapshot.totalBytes;
+
             task.on(firebase.storage.TaskEvent.STATE_CHANGED,
                 snapshot => {
                     progress.set(snapshot.ref.name, {bytesTransferred: snapshot.bytesTransferred, running: true});
                     updateUploadingInfo();
                 },
                 null,
-                () => {
-                    const {ref: {name}, totalBytes} = task.snapshot;
+                async () => {
+                    const {ref, ref: {name}, totalBytes} = task.snapshot;
                     progress.set(name, {bytesTransferred: totalBytes, running: false});
                     updateUploadingInfo();
+
+                    const url = await task.snapshot.ref.getDownloadURL();
+                    databaseInfo.push({name, url, size: totalBytes, path: ref.fullPath});
+
+                    if (!Array.from(progress.values()).some(info => info.running)) {
+                        await firestore.collection('share').doc(id).set({id, files: databaseInfo});
+
+                        setState(State.FINISHED);
+                    }
                 });
+        }
 
     }, [selectedFiles]);
 
 
-    if (uploadInfo.filesUploaded === uploadInfo.filesTotal)
-        return <Redirect to={`/share/${uploadInfo.id}`}/>;
+    switch (state) {
+        case State.FINISHED:
+            return <Redirect to={`/share/${uploadInfo.id}`}/>;
 
-    if (uploading)
-        return (
-            <UploadProgressContainer
-                filesUploaded={uploadInfo.filesUploaded}
-                filesTotal={uploadInfo.filesTotal}
-                bytesUploaded={uploadInfo.bytesUploaded}
-                bytesTotal={uploadInfo.bytesTotal}
-            />
-        );
+        case State.UPLOADING:
+            return (
+                <UploadProgressContainer
+                    filesUploaded={uploadInfo.filesUploaded}
+                    filesTotal={uploadInfo.filesTotal}
+                    bytesUploaded={uploadInfo.bytesUploaded}
+                    bytesTotal={uploadInfo.bytesTotal}
+                />
+            );
 
-    return (
-        <div
-            className={
-                selectedFiles.length > 0
-                    ? styles.content__selected
-                    : styles.content
-            }
-            {...getRootProps()}
-        >
-            <Container gridArea={'headline'}>
-                <h1 className={styles.headline}>UPLOAD FILES</h1>
-            </Container>
-
-            <div className={styles.left}>
-                <Container>
-                    <FileUploadContainer/>
-
-                    <input
-                        className={styles.input}
-                        id={'input'}
-                        {...getInputProps()}
-                    />
-                </Container>
-
-                {selectedFiles.length > 0 && (
-                    <Container>
-                        <div className={styles.inline}>
-                            <span>Available for</span>
-                            <DropdownMenu options={timeOptions}/>
-                        </div>
-                        <Button onClick={generateLink}>Generate Link</Button>
+        case State.SELECTING:
+            return (
+                <div
+                    className={
+                        selectedFiles.length > 0
+                            ? styles.content__selected
+                            : styles.content
+                    }
+                    {...getRootProps()}
+                >
+                    <Container gridArea={'headline'}>
+                        <h1 className={styles.headline}>UPLOAD FILES</h1>
                     </Container>
-                )}
-            </div>
 
-            {selectedFiles.length > 0 && (
-                <Container gridArea={'selectedFiles'}>
-                    <SelectedFilesContainer
-                        selectedFiles={selectedFiles}
-                        removeFile={removeFile}
-                    />
-                </Container>
-            )}
+                    <div className={styles.left}>
+                        <Container>
+                            <FileUploadContainer/>
 
-            {isDragActive && <div className={styles.dropIndicator}/>}
-        </div>
-    );
+                            <input
+                                className={styles.input}
+                                id={'input'}
+                                {...getInputProps()}
+                            />
+                        </Container>
+
+                        {selectedFiles.length > 0 && (
+                            <Container>
+                                <div className={styles.inline}>
+                                    <span>Available for</span>
+                                    <DropdownMenu options={timeOptions}/>
+                                </div>
+                                <Button onClick={generateLink}>Generate Link</Button>
+                            </Container>
+                        )}
+                    </div>
+
+                    {selectedFiles.length > 0 && (
+                        <Container gridArea={'selectedFiles'}>
+                            <SelectedFilesContainer
+                                selectedFiles={selectedFiles}
+                                removeFile={removeFile}
+                            />
+                        </Container>
+                    )}
+
+                    {isDragActive && <div className={styles.dropIndicator}/>}
+                </div>
+            );
+    }
 };
 
 const FileUploadContainer = () => (
