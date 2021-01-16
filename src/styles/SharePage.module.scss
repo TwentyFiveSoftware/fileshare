@@ -70,6 +70,7 @@
     justify-items: center;
     gap: 2rem;
     margin-top: 2rem;
+    align-items: start;
 }
 
 .file {
@@ -85,6 +86,7 @@
     border-radius: 1rem 1rem 0 0;
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
 }
 
 .fileBottom {
@@ -92,6 +94,12 @@
     display: grid;
     grid-template-columns: 1fr max-content;
     align-items: center;
+}
+
+.fileBottom__noImage {
+    @extend .fileBottom;
+
+    padding: 2rem 2.5rem;
 }
 
 .fileName {

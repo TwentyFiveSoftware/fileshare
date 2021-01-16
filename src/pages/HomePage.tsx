@@ -88,7 +88,7 @@ const HomePage: FunctionComponent = () => {
             setUploadInfo({bytesTotal, bytesUploaded, filesUploaded, filesTotal: selectedFiles.length, id});
         }
 
-        const databaseInfo: { name: string, url: string, size: number, path: string }[] = [];
+        const databaseInfo: { name: string, url: string, size: number, path: string, isImage: boolean }[] = [];
 
         for (const file of selectedFiles) {
             const task = storage.ref(`${id}/${file.name}`).put(file);
@@ -107,7 +107,7 @@ const HomePage: FunctionComponent = () => {
                     updateUploadingInfo();
 
                     const url = await task.snapshot.ref.getDownloadURL();
-                    databaseInfo.push({name, url, size: totalBytes, path: ref.fullPath});
+                    databaseInfo.push({name, url, size: totalBytes, path: ref.fullPath, isImage: file.type.startsWith('image/')});
 
                     if (!Array.from(progress.values()).some(info => info.running)) {
                         await firestore.collection('share').doc(id).set({

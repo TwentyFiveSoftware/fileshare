@@ -17,7 +17,8 @@ enum State {
 type SharedFile = {
     name: string,
     size: number,
-    url: string
+    url: string,
+    isImage: boolean
 }
 
 const dateFormat = Intl.DateTimeFormat('de', {day: '2-digit', month: '2-digit', year: 'numeric'});
@@ -39,7 +40,7 @@ const SharePage = () => {
 
             const {files, bytesTotal, availableUntil} = result.data() as { files: SharedFile[], bytesTotal: number, availableUntil: firebase.firestore.Timestamp };
 
-            setFiles(files);
+            setFiles(files.sort((a, b) => a.isImage === b.isImage ? (a.name < b.name ? -1 : 1) : (a.isImage ? -1 : 1)));
             setInfo({bytesTotal, availableUntil: dateFormat.format(availableUntil.toDate())});
 
             setState(State.SUCCESS);
@@ -117,7 +118,7 @@ const SharePage = () => {
 };
 
 
-const FileContainer: FunctionComponent<{ name: string, size: number, url: string }> = ({name, size, url}) => {
+const FileContainer: FunctionComponent<SharedFile> = ({name, size, url, isImage}) => {
     const downloadFile = async () => {
         const response = await fetch(url);
         const blob = await response.blob();
@@ -135,8 +136,8 @@ const FileContainer: FunctionComponent<{ name: string, size: number, url: string
 
     return (
         <div className={styles.file}>
-            <div className={styles.fileTop} style={{backgroundImage: `url(${url})`}}/>
-            <div className={styles.fileBottom}>
+            {isImage && <div className={styles.fileTop} style={{backgroundImage: `url(${url})`}}/>}
+            <div className={isImage ? styles.fileBottom : styles.fileBottom__noImage}>
                 <div className={styles.fileInfo}>
                     <div className={styles.fileName}>{name}</div>
                     <div className={styles.fileSize}>{toHumanFileSize(size)}</div>
