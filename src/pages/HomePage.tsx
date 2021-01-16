@@ -1,5 +1,6 @@
 import React, {FunctionComponent, useCallback, useState} from 'react';
 import {FileRejection, useDropzone} from 'react-dropzone';
+import {Redirect} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons';
 import {nanoid} from 'nanoid';
@@ -10,7 +11,6 @@ import Button from '../components/Button';
 import DropdownMenu from '../components/DropdownMenu';
 import SelectedFilesContainer from '../components/SelectedFilesContainer';
 import UploadProgressContainer from '../components/UploadProgressContainer';
-import {Redirect} from "react-router-dom";
 
 const timeOptions: { label: string; value: number }[] = [
     {label: '1 day', value: 1},

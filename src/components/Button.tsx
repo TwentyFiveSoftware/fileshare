@@ -3,9 +3,10 @@ import styles from '../styles/Button.module.scss';
 
 const Button: FunctionComponent<{
     onClick?: Function;
-}> = ({ onClick, children }) => (
+    small?: boolean,
+}> = ({ onClick, small = false, children }) => (
     <div
-        className={styles.button}
+        className={small ? styles.button__small : styles.button}
         onClick={onClick ? () => onClick() : undefined}
     >
         {children}

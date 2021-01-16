@@ -10,3 +10,10 @@
     cursor: pointer;
     font-weight: 600;
 }
+
+.button__small {
+    @extend .button;
+
+    font-size: 1.6rem;
+    padding: 0.5rem 3rem;
+}

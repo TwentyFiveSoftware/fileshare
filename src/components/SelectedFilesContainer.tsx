@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/HomePage.module.scss';
 
-const toHumanFileSize = (size: number) => {
+export const toHumanFileSize = (size: number) => {
     const i = Math.floor(Math.log(size) / Math.log(1024));
     const s = Number(size / Math.pow(1024, i)).toFixed(2);
     return `${s} ${['B', 'KB', 'MB', 'GB'][i]}`;
