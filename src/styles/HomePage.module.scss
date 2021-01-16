@@ -14,6 +14,11 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: max-content 1fr;
     grid-template-areas: 'headline headline' 'left selectedFiles';
+
+    @media (max-width: 850px) {
+        grid-template-columns: 1fr;
+        grid-template-areas: 'headline' 'selectedFiles' 'left';
+    }
 }
 
 .dropIndicator {
@@ -33,6 +38,10 @@
     justify-items: center;
     row-gap: 1rem;
     padding: 3rem 0;
+
+    @media (max-width: 850px) {
+        padding: 0;
+    }
 }
 
 .icon {
@@ -129,6 +138,9 @@
     grid-area: left;
     display: grid;
     row-gap: 3rem;
+
+    @media (max-width: 850px) {
+    }
 }
 
 .inline {

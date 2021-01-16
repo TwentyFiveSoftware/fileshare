@@ -4,6 +4,10 @@
     @extend .content;
 
     gap: 2rem;
+
+    @media (max-width: 500px) {
+        gap: 0;
+    }
 }
 
 .inputContainer {
@@ -26,6 +30,7 @@
     font-size: 1.6rem;
     color: var(--color-primary);
     cursor: text;
+    padding: 0 4rem 0 1.5rem;
 }
 
 .inputCopy {
@@ -44,6 +49,11 @@
     gap: 1.5rem;
     padding: 0 2rem;
     align-items: center;
+
+    @media (max-width: 780px) {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }
 
 .text {
@@ -60,17 +70,23 @@
 
 .spacer {
     flex: 1;
+
+    @media (max-width: 780px) {
+        display: none;
+    }
 }
 
 .fileContainer {
-    max-width: 120rem;
-    height: max-content;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
     justify-items: center;
     gap: 2rem;
     margin-top: 2rem;
     align-items: start;
+
+    @media (max-width: 500px) {
+        padding: 2rem;
+    }
 }
 
 .file {
