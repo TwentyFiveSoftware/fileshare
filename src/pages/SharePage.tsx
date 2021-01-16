@@ -78,7 +78,14 @@ const SharePage = () => {
             return <div/>;
 
         case State.ERROR:
-            return <Redirect to={'/'}/>
+            return (
+                <div className={styles.content}>
+                    <Container>
+                        <h1 className={styles.headline}>No files available!</h1>
+                        <h1 className={styles.headline}>Your URL may be wrong or has already expired!</h1>
+                    </Container>
+                </div>
+            );
 
         case State.SUCCESS:
             return (

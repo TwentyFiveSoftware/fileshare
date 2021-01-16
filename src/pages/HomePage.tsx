@@ -73,7 +73,7 @@ const HomePage: FunctionComponent = () => {
         setSelectedFiles((files) => files.filter((f) => f !== file));
     }, []);
 
-    const generateLink = useCallback(() => {
+    const generateUrl = useCallback(() => {
         setState(State.UPLOADING);
 
         const id = nanoid();
@@ -169,7 +169,7 @@ const HomePage: FunctionComponent = () => {
                                     <span>Available for</span>
                                     <DropdownMenu options={timeOptions} selectedIndexChange={(newTimeIndex: number) => setTimeIndex(newTimeIndex)}/>
                                 </div>
-                                <Button onClick={generateLink}>Generate Link</Button>
+                                <Button onClick={generateUrl}>Generate URL</Button>
                             </Container>
                         )}
                     </div>
