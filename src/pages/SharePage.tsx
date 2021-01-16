@@ -2,7 +2,7 @@ import React, {FunctionComponent, createRef, useEffect, useState} from 'react';
 import {Redirect, useParams} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowAltCircleDown, faClipboardList} from '@fortawesome/free-solid-svg-icons';
-import {firestore} from '../firebase';
+import firebase, {firestore} from '../firebase';
 import styles from '../styles/SharePage.module.scss';
 import {toHumanFileSize} from '../components/SelectedFilesContainer';
 import Container from '../components/Container';
@@ -20,10 +20,13 @@ type SharedFile = {
     url: string
 }
 
+const dateFormat = Intl.DateTimeFormat('de', {day: '2-digit', month: '2-digit', year: 'numeric'});
+
 const SharePage = () => {
     const {id} = useParams<{ id: string }>();
     const [state, setState] = useState<State>(State.LOADING);
     const [files, setFiles] = useState<SharedFile[]>([]);
+    const [info, setInfo] = useState<{ bytesTotal: number, availableUntil: string }>({bytesTotal: 0, availableUntil: ''});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,7 +37,11 @@ const SharePage = () => {
                 return;
             }
 
-            setFiles(result.data()?.files);
+            const {files, bytesTotal, availableUntil} = result.data() as { files: SharedFile[], bytesTotal: number, availableUntil: firebase.firestore.Timestamp };
+
+            setFiles(files);
+            setInfo({bytesTotal, availableUntil: dateFormat.format(availableUntil.toDate())});
+
             setState(State.SUCCESS);
         }
 
@@ -74,9 +81,9 @@ const SharePage = () => {
                         <div className={styles.info}>
                             <div className={styles.text}>{files.length} file{files.length !== 1 ? 's' : ''}</div>
                             <div className={styles.dot}/>
-                            <div className={styles.text}>--- MB</div>
+                            <div className={styles.text}>{toHumanFileSize(info.bytesTotal)}</div>
                             <div className={styles.dot}/>
-                            <div className={styles.text}>Available until --.--.----</div>
+                            <div className={styles.text}>Available until {info.availableUntil}</div>
 
                             <div className={styles.spacer}/>
 

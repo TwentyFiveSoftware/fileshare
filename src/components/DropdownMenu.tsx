@@ -5,7 +5,8 @@ import styles from '../styles/DropdownMenu.module.scss';
 
 const DropdownMenu: FunctionComponent<{
     options: { label: string; value: number }[];
-}> = ({ options }) => {
+    selectedIndexChange: Function
+}> = ({ options , selectedIndexChange}) => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [active, setActive] = useState<boolean>(false);
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -43,6 +44,7 @@ const DropdownMenu: FunctionComponent<{
                         onClick={() => {
                             setSelectedIndex(index);
                             setActive(false);
+                            selectedIndexChange(index);
                         }}
                         key={index}
                     >

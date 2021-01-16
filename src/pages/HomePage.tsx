@@ -38,6 +38,7 @@ const HomePage: FunctionComponent = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadInfo, setUploadInfo] = useState<UploadInfo>({filesUploaded: 0, filesTotal: 1, bytesUploaded: 0, bytesTotal: 1, id: ''});
     const [state, setState] = useState<State>(State.SELECTING);
+    const [timeIndex, setTimeIndex] = useState<number>(0);
 
     const onDrop = useCallback(
         (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -99,6 +100,7 @@ const HomePage: FunctionComponent = () => {
                     updateUploadingInfo();
                 },
                 null,
+                // eslint-disable-next-line no-loop-func
                 async () => {
                     const {ref, ref: {name}, totalBytes} = task.snapshot;
                     progress.set(name, {bytesTransferred: totalBytes, running: false});
@@ -108,14 +110,19 @@ const HomePage: FunctionComponent = () => {
                     databaseInfo.push({name, url, size: totalBytes, path: ref.fullPath});
 
                     if (!Array.from(progress.values()).some(info => info.running)) {
-                        await firestore.collection('share').doc(id).set({id, files: databaseInfo});
+                        await firestore.collection('share').doc(id).set({
+                            id,
+                            files: databaseInfo,
+                            bytesTotal,
+                            availableUntil: new Date(Date.now() + timeOptions[timeIndex].value * 24 * 3600000)
+                        });
 
                         setState(State.FINISHED);
                     }
                 });
         }
 
-    }, [selectedFiles]);
+    }, [selectedFiles, timeIndex]);
 
 
     switch (state) {
@@ -161,7 +168,7 @@ const HomePage: FunctionComponent = () => {
                             <Container>
                                 <div className={styles.inline}>
                                     <span>Available for</span>
-                                    <DropdownMenu options={timeOptions}/>
+                                    <DropdownMenu options={timeOptions} selectedIndexChange={(newTimeIndex: number) => setTimeIndex(newTimeIndex)}/>
                                 </div>
                                 <Button onClick={generateLink}>Generate Link</Button>
                             </Container>
