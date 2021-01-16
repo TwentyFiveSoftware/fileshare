@@ -2,12 +2,15 @@ import React, {FunctionComponent, useCallback, useState} from 'react';
 import {FileRejection, useDropzone} from 'react-dropzone';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons';
+import {nanoid} from 'nanoid';
+import firebase, {storageRef} from '../firebase';
 import styles from '../styles/HomePage.module.scss';
 import Container from '../components/Container';
 import Button from '../components/Button';
 import DropdownMenu from '../components/DropdownMenu';
 import SelectedFilesContainer from '../components/SelectedFilesContainer';
 import UploadProgressContainer from '../components/UploadProgressContainer';
+import {Redirect} from "react-router-dom";
 
 const timeOptions: { label: string; value: number }[] = [
     {label: '1 day', value: 1},
@@ -17,9 +20,18 @@ const timeOptions: { label: string; value: number }[] = [
     {label: '14 days', value: 14},
 ];
 
+type UploadInfo = {
+    filesUploaded: number,
+    filesTotal: number,
+    bytesUploaded: number,
+    bytesTotal: number,
+    id: string
+}
+
 const HomePage: FunctionComponent = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState<boolean>(false);
+    const [uploadInfo, setUploadInfo] = useState<UploadInfo>({filesUploaded: 0, filesTotal: 1, bytesUploaded: 0, bytesTotal: 1, id: ''});
 
     const onDrop = useCallback(
         (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -57,15 +69,49 @@ const HomePage: FunctionComponent = () => {
 
     const generateLink = useCallback(() => {
         setUploading(true);
-    }, []);
+
+        const id = nanoid();
+        const uploadingTasks: firebase.storage.UploadTask[] = [];
+        const progress: Map<string, { bytesTransferred: number, running: boolean }> = new Map();
+
+        for (const file of selectedFiles)
+            uploadingTasks.push(storageRef.child(`${id}/${file.name}`).put(file));
+
+        const bytesTotal = uploadingTasks.reduce((sum, task) => sum + task.snapshot.totalBytes, 0);
+
+        const updateUploadingInfo = () => {
+            const arr = Array.from(progress.values());
+            const bytesUploaded = arr.reduce((sum, info) => sum + info.bytesTransferred, 0);
+            const filesUploaded = arr.reduce((sum, info) => sum + (info.running ? 0 : 1), 0);
+            setUploadInfo({bytesTotal, bytesUploaded, filesUploaded, filesTotal: selectedFiles.length, id});
+        }
+
+        for (const task of uploadingTasks)
+            task.on(firebase.storage.TaskEvent.STATE_CHANGED,
+                snapshot => {
+                    progress.set(snapshot.ref.name, {bytesTransferred: snapshot.bytesTransferred, running: true});
+                    updateUploadingInfo();
+                },
+                null,
+                () => {
+                    const {ref: {name}, totalBytes} = task.snapshot;
+                    progress.set(name, {bytesTransferred: totalBytes, running: false});
+                    updateUploadingInfo();
+                });
+
+    }, [selectedFiles]);
+
+
+    if (uploadInfo.filesUploaded === uploadInfo.filesTotal)
+        return <Redirect to={`/share/${uploadInfo.id}`}/>;
 
     if (uploading)
         return (
             <UploadProgressContainer
-                filesUploaded={0}
-                filesTotal={1}
-                bytesUploaded={0}
-                bytesTotal={10000}
+                filesUploaded={uploadInfo.filesUploaded}
+                filesTotal={uploadInfo.filesTotal}
+                bytesUploaded={uploadInfo.bytesUploaded}
+                bytesTotal={uploadInfo.bytesTotal}
             />
         );
 

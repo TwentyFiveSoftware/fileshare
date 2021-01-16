@@ -30,8 +30,8 @@ const UploadProgressContainer: FunctionComponent<Props> = ({
                         {filesUploaded} / {filesTotal} files
                     </b>
                     <span className={styles.text}>
-                        {(bytesUploaded / 1000).toFixed(1)} MB /{' '}
-                        {(bytesTotal / 1000).toFixed(1)} MB (
+                        {(bytesUploaded / 1000000).toFixed(1)} MB /{' '}
+                        {(bytesTotal / 1000000).toFixed(1)} MB (
                         {((bytesUploaded * 100) / bytesTotal).toFixed(1)}%)
                     </span>
                 </div>
