@@ -55,6 +55,23 @@ const SharePage = () => {
         document.execCommand('copy');
     }
 
+    const downloadAllFiles = async () => {
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        document.body.appendChild(a);
+
+        for (const file of files) {
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+
+            a.href = URL.createObjectURL(blob);
+            a.download = file.name;
+            a.click();
+        }
+
+        document.body.removeChild(a);
+    }
+
     switch (state) {
         case State.LOADING:
             return <div/>;
@@ -87,7 +104,7 @@ const SharePage = () => {
 
                             <div className={styles.spacer}/>
 
-                            <Button small={true}>Download all files</Button>
+                            <Button small={true} onClick={() => downloadAllFiles()}>Download all files</Button>
                         </div>
                     </Container>
 
@@ -107,6 +124,7 @@ const FileContainer: FunctionComponent<{ name: string, size: number, url: string
         const blobUrl = URL.createObjectURL(blob);
 
         const a = document.createElement('a');
+        a.style.display = 'none';
         a.href = blobUrl;
         a.download = name;
 
