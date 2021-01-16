@@ -101,6 +101,20 @@ const SharePage = () => {
 
 
 const FileContainer: FunctionComponent<{ name: string, size: number, url: string }> = ({name, size, url}) => {
+    const downloadFile = async () => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = name;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
     return (
         <div className={styles.file}>
             <div className={styles.fileTop} style={{backgroundImage: `url(${url})`}}/>
@@ -109,7 +123,7 @@ const FileContainer: FunctionComponent<{ name: string, size: number, url: string
                     <div className={styles.fileName}>{name}</div>
                     <div className={styles.fileSize}>{toHumanFileSize(size)}</div>
                 </div>
-                <a href={url} className={styles.fileIcon}><FontAwesomeIcon icon={faArrowAltCircleDown}/></a>
+                <div className={styles.fileIcon} onClick={() => downloadFile()}><FontAwesomeIcon icon={faArrowAltCircleDown}/></div>
             </div>
         </div>
     );
