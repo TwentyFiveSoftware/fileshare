@@ -109,12 +109,11 @@ const HomePage: FunctionComponent = () => {
                     databaseInfo.push({name, url, size: totalBytes, path: ref.fullPath, isImage: file.type.startsWith('image/')});
 
                     if (!Array.from(progress.values()).some(info => info.running)) {
-                        await firestore.collection('share').doc(id).set({
-                            id,
-                            files: databaseInfo,
-                            bytesTotal,
-                            availableUntil: new Date(Date.now() + timeOptions[timeIndex].value * 24 * 3600000)
-                        });
+                        const availableUntil = new Date();
+                        availableUntil.setDate(availableUntil.getDate() + timeOptions[timeIndex].value);
+                        availableUntil.setHours(23, 59, 59, 0);
+
+                        await firestore.collection('share').doc(id).set({id, files: databaseInfo, bytesTotal, availableUntil});
 
                         setState(State.FINISHED);
                     }

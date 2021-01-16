@@ -40,6 +40,11 @@ const SharePage = () => {
 
             const {files, bytesTotal, availableUntil} = result.data() as { files: SharedFile[], bytesTotal: number, availableUntil: firebase.firestore.Timestamp };
 
+            if (availableUntil.toMillis() < Date.now()) {
+                setState(State.ERROR);
+                return;
+            }
+
             setFiles(files.sort((a, b) => a.isImage === b.isImage ? (a.name < b.name ? -1 : 1) : (a.isImage ? -1 : 1)));
             setInfo({bytesTotal, availableUntil: dateFormat.format(availableUntil.toDate())});
 
