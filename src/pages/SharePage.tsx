@@ -1,5 +1,5 @@
 import React, {FunctionComponent, createRef, useEffect, useState} from 'react';
-import {Redirect, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowAltCircleDown, faClipboardList} from '@fortawesome/free-solid-svg-icons';
 import firebase, {firestore} from '../firebase';
