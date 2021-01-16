@@ -46,7 +46,7 @@ const HomePage: FunctionComponent = () => {
                 (file) => !selectedFiles.some((f) => f.name === file.name),
             );
 
-            setSelectedFiles((files) => [...files, ...filteredFiles]);
+            setSelectedFiles((files) => [...files, ...filteredFiles].sort((a,b) => a.name < b.name ? -1 : 1));
 
             if (filteredFiles.length !== acceptedFiles.length)
                 alert(
