@@ -42,23 +42,22 @@ const HomePage: FunctionComponent = () => {
 
     const onDrop = useCallback(
         (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-            const filteredFiles = acceptedFiles.filter(
-                (file) => !selectedFiles.some((f) => f.name === file.name),
-            );
+            const filteredFiles = acceptedFiles.filter((file) => !selectedFiles.some((f) => f.name === file.name));
 
-            setSelectedFiles((files) => [...files, ...filteredFiles].sort((a,b) => a.name < b.name ? -1 : 1));
+            setSelectedFiles((files) => [...files, ...filteredFiles].sort((a, b) => a.name < b.name ? -1 : 1));
 
             if (filteredFiles.length !== acceptedFiles.length)
-                alert(
-                    `${
-                        acceptedFiles.length - filteredFiles.length
-                    } file(s) with the same name is/are already selected!`,
-                );
+                if (acceptedFiles.length - filteredFiles.length === 1)
+                    alert(`1 file has a name that already exists!`);
+                else
+                    alert(`${acceptedFiles.length - filteredFiles.length} files have a name that already exists!`);
 
-            if (fileRejections.length > 0)
-                alert(
-                    `${fileRejections.length} file(s) exceeds the maximum file size of 3 GB!`,
-                );
+            if (fileRejections.length > 0) {
+                if (fileRejections.length === 1)
+                    alert(`1 file exceeds the maximum file size of 3 GB!`);
+                else
+                    alert(`${fileRejections.length} files exceed the maximum file size of 3 GB!`);
+            }
         },
         [selectedFiles],
     );
